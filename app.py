@@ -7,6 +7,7 @@ numberOfTasks = 0
 tasks = []
 ar = {}
 nodeTaskMap = {}
+TaskDurationMap = {} 
 TaskNodeMap = {}
 curr_i = 0
 curr_j = 0
@@ -21,20 +22,26 @@ def displayTopoOrdering(topo):
 
     label = tk.Label(frame, text="A VALID ORDERING OF TASKS")
     label.pack(padx=4, pady=4)
-
+    totalTimeTaken = 0 
     if len(topo) == 0: 
         print("Here ")
         label.config(text="CYCLE EXISTS, TASKS CANNOT BE ORDERED")
     for i in range(len(topo)): 
         levelFrame = tk.Label(frame,width=200, height=40, bg="white")
         levelFrame.pack(pady=4, padx=2)
+        maxi = 0 
         for j in topo[i]:
             taskLabel = tk.Label(levelFrame, text=nodeTaskMap[j], bg="white",  relief="solid", borderwidth=1, highlightthickness=1, highlightbackground="black", padx=4, pady=4)
             taskLabel.pack(side="left", padx=4, pady=2)
+            maxi = max(maxi, TaskDurationMap[nodeTaskMap[j]])
+        totalTimeTaken += maxi 
+        durationLabel = tk.Label(levelFrame, text=f"Duration : {maxi}")
+        durationLabel.pack(side="left", padx=4, pady=2)
         if i != len(topo)-1:
             arrowLabel = tk.Label(frame, text="↓", bg="white")
             arrowLabel.pack()
-
+    totalTimeTakenLabel = tk.Label(window, bg="white", relief="solid", borderwidth=1, highlightbackground="black", highlightthickness=1,  font=font.Font(size=12), width=20, height=2, text=f"Total Time: {totalTimeTaken}")
+    totalTimeTakenLabel.pack(padx=5, pady=10) 
 def clear_frame(frame):
     for widget in frame.winfo_children():
         widget.destroy()
@@ -125,10 +132,12 @@ def assignMap():
         TaskNodeMap[tasks[i]] = i+1
     print(nodeTaskMap)
 
-def storeTasks(tasksEntries, tasksFrame): 
+def storeTasks(tasksEntries, tasksFrame, durationEntries): 
     for i in range(numberOfTasks):
         tasks.append(tasksEntries[i].get())
+        TaskDurationMap[tasksEntries[i].get()] = int(durationEntries[i].get())
     print(tasks)
+    print("TaskDuration map ", TaskDurationMap)
     tasksFrame.destroy()
     assignMap()
     inputGraph()
@@ -141,6 +150,7 @@ def inputTasks():
     enterTasksLabel = tk.Label(tasksFrame, text="Enter the tasks") 
     enterTasksLabel.pack()
     tasksEntries = []
+    durationEntries = []
     print("No. of tasks ", numberOfTasks)
     for i in range(numberOfTasks):
         taskFrame = tk.Frame(tasksFrame, width=100, height=20, padx=4,pady=4)
@@ -150,8 +160,14 @@ def inputTasks():
         taskEntry = tk.Entry(taskFrame, width=80, font=font.Font(size=12))
         taskEntry.pack(side="left", padx=5, pady=5)
         tasksEntries.append(taskEntry)
+        durationLabel = tk.Label(taskFrame, text=f"Duration : ",)
+        durationLabel.pack(side="left", padx=5, pady=5)
+        durationEntry = tk.Entry(taskFrame, width=10, font=font.Font(size=12))
+        durationEntry.pack(side="left", padx=5, pady=5)
+        durationEntries.append(durationEntry)
     
-    enterTasksButton = tk.Button(tasksFrame, text="Next", command = lambda : storeTasks(tasksEntries, tasksFrame), borderwidth=2, width = 8, bg = "#d9d5d4")
+    
+    enterTasksButton = tk.Button(tasksFrame, text="Next", command = lambda : storeTasks(tasksEntries, tasksFrame, durationEntries), borderwidth=2, width = 8, bg = "#d9d5d4")
     enterTasksButton.pack(padx=5, pady=5)
 
     
